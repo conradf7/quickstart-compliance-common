@@ -83,10 +83,14 @@ Parameters:
         Description: CIDR of Production VPC
         Type: String
         Default: ''
-    pRouteTableProdPrivate:
-        Description: Route Table ID for Prod VPC Private
+    pRouteTableProdPrivateA:
+        Description: Route Table ID for Prod VPC Private A (first AZ)
         Type: String
         Default: ''
+    pRouteTableProdPrivateB:
+        Description: Route Table ID for Prod VPC Private B (second AZ)
+        Type: String
+        Default: ''        
     pRouteTableProdPublic:
         Description: Route Table ID for Prod VPC Public
         Type: String
@@ -467,13 +471,20 @@ Resources:
             RouteTableId: !Ref rRouteTableMgmtPrivate
             DestinationCidrBlock: 0.0.0.0/0
             NatGatewayId: !Ref rNATGateway
-    rRouteProdMgmt:
+    rRouteProdPrivateAMgmt:
         Condition: cCreatePeeringProduction
         Type: AWS::EC2::Route
         Properties:
-            RouteTableId: !Ref pRouteTableProdPrivate
+            RouteTableId: !Ref pRouteTableProdPrivateA
             VpcPeeringConnectionId: !Ref rPeeringConnectionProduction
             DestinationCidrBlock: !Ref pManagementCIDR
+    rRouteProdPrivateBMgmt:
+        Condition: cCreatePeeringProduction
+        Type: AWS::EC2::Route
+        Properties:
+            RouteTableId: !Ref pRouteTableProdPrivateB
+            VpcPeeringConnectionId: !Ref rPeeringConnectionProduction
+            DestinationCidrBlock: !Ref pManagementCIDR            
     rRouteProdMgmtPublic:
         Condition: cCreatePeeringProduction
         Type: AWS::EC2::Route
